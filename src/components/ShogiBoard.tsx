@@ -20,10 +20,14 @@ const ShogiBoard: React.FC = () => {
     ];
 
     const [move, setMove] = useState('');
+    const [blackCaptured, setBlackCaptured] = useState<string[]>([]);
+    const [whiteCaptured, setWhiteCaptured] = useState<string[]>([]);
 
     const pieceSymbols: { [key: string]: string } = {
         'p': '歩', 'l': '香', 'n': '桂', 's': '銀', 'g': '金', 'k': '王', 'r': '飛', 'b': '角',
-        'P': '歩', 'L': '香', 'N': '桂', 'S': '銀', 'G': '金', 'K': '玉', 'R': '飛', 'B': '角'
+        'P': '歩', 'L': '香', 'N': '桂', 'S': '銀', 'G': '金', 'K': '玉', 'R': '飛', 'B': '角',
+        '+p': 'と', '+l': '杏', '+n': '圭', '+s': '全', '+r': '龍', '+b': '馬',
+        '+P': 'と', '+L': '杏', '+N': '圭', '+S': '全', '+R': '龍', '+B': '馬'
     };
 
     const handleMoveSubmit = () => {
@@ -63,6 +67,20 @@ const ShogiBoard: React.FC = () => {
         return <div className="row coordinates-row">{topCoords}</div>;
     };
 
+    const renderCapturedPieces = (captured: string[], isBlack: boolean) => {
+        return (
+            <div className="captured-pieces">
+                {captured.map((piece, index) => (
+                    <Piece
+                        key={index}
+                        symbol={pieceSymbols[piece]}
+                        isBlack={isBlack}
+                    />
+                ))}
+            </div>
+        );
+    };
+
     return (
         <div className="board-container">
             {renderTopCoordinates()}
@@ -75,6 +93,16 @@ const ShogiBoard: React.FC = () => {
                     placeholder="e.g., 7g7f"
                 />
                 <button onClick={handleMoveSubmit}>Submit Move</button>
+            </div>
+            <div className="captured-container">
+                <div className="black-captured">
+                    <h3>Black Captured</h3>
+                    {renderCapturedPieces(blackCaptured, true)}
+                </div>
+                <div className="white-captured">
+                    <h3>White Captured</h3>
+                    {renderCapturedPieces(whiteCaptured, false)}
+                </div>
             </div>
         </div>
     );
