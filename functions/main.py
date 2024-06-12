@@ -1,13 +1,17 @@
-# Welcome to Cloud Functions for Firebase for Python!
-# To get started, simply uncomment the below code or create your own.
-# Deploy with `firebase deploy`
+"""
+Welcome to Cloud Functions for Firebase for Python!
+To get started, simply uncomment the below code or create your own.
+Deploy with `firebase deploy
+"""
 
-from firebase_functions import https_fn
+from firebase_functions.https_fn import Request, Response, on_request
 from firebase_admin import initialize_app
 
 initialize_app()
 
 
-@https_fn.on_request()
-def on_request_example(req: https_fn.Request) -> https_fn.Response:
-    return https_fn.Response("Hello world!")
+@on_request()
+def on_request_example(req: Request) -> Response:
+    """Test endpoint"""
+    print(req.data)
+    return Response("Hello world!")

@@ -1,0 +1,9 @@
+[MASTER]
+
+# Specify errors or warnings to ignore
+# W0212: Access to a protected member
+
+disable = W0212
+
+# Set the maximum line length to 140 characters
+max-line-length=140

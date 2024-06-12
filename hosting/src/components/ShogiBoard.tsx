@@ -59,9 +59,9 @@ const ShogiBoard: React.FC = () => {
   };
 
   const renderBoard = () => {
-    let board = [];
+    const board = [];
     for (let row = 0; row < rows; row++) {
-      let cells = [];
+      const cells = [];
       for (let col = 0; col < cols; col++) {
         const piece = initialBoard[row][col];
         cells.push(
@@ -87,7 +87,7 @@ const ShogiBoard: React.FC = () => {
   };
 
   const renderTopCoordinates = () => {
-    let topCoords = [];
+    const topCoords = [];
     for (let col = 0; col < cols; col++) {
       topCoords.push(
         <div key={`top-${col}`} className="coordinate">
