@@ -26,7 +26,7 @@ jobs:
       - name: Deploy to Firebase Functions
         run: |
           source functions/venv/bin/activate
-          firebase deploy --only functions --token ${{secrets.FIREBASE_SERVICE_ACCOUNT_PAYROLL_INTEGRATION_HUB}}
+          firebase deploy --only functions --token ${{secrets.FIREBASE_SERVICE_ACCOUNT_SHOGIAI}}
 
   deploy_storage:
     runs-on: ubuntu-latest

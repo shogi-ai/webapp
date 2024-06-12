@@ -4,3 +4,4 @@ public/
 *debug.log
 .firebase/
 .env
+node_modules

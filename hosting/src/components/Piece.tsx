@@ -1,5 +1,4 @@
-import React from 'react';
-import './Piece.css';
+import "./Piece.css";
 
 interface PieceProps {
   symbol: string;
@@ -7,11 +6,7 @@ interface PieceProps {
 }
 
 const Piece: React.FC<PieceProps> = ({ symbol, isBlack }) => {
-  return (
-    <div className={`piece ${isBlack ? 'black' : 'white'}`}>
-      {symbol}
-    </div>
-  );
+  return <div className={`piece ${isBlack ? "black" : "white"}`}>{symbol}</div>;
 };
 
 export default Piece;
