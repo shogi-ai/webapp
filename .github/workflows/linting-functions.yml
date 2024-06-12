@@ -43,4 +43,5 @@ jobs:
 
       - name: Analysing the code with pylint
         run: |
+          cd functions
           pylint --rcfile=.pylintrc $(git ls-files '*.py')
