@@ -19,6 +19,9 @@ export const Shogi = () => {
         <>
           <h1>Shogi Board</h1>
           <ShogiBoard />
+          <button className="restart-game-button" onClick={create}>
+            Restart Game
+          </button>
         </>
       ) : (
         <>

@@ -47,6 +47,23 @@
   background-color: #0056b3;
 }
 
+.restart-game-button {
+  padding: 15px 30px;
+  background-color: #ff2600;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  transition: background-color 0.3s ease;
+  transform: translate(-50%, -50%);
+  float: right;
+}
+
+.restart-game-button:hover {
+  background-color: rgb(179, 0, 0);
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
