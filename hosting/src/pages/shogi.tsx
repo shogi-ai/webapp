@@ -8,7 +8,6 @@ export const Shogi = () => {
   const { currentGame, get, create } = useGame();
 
   useEffect(() => {
-    console.log("get game data");
     get();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
