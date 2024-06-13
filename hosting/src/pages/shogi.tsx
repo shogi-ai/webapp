@@ -3,9 +3,10 @@ import { ShogiBoard } from "../components/ShogiBoard";
 import "../App.css";
 import { useGame } from "../hooks/useGame";
 import { useEffect } from "react";
+import { Loading } from "../components/loading/Loading";
 
 export const Shogi = () => {
-  const { currentGame, get, create } = useGame();
+  const { currentGame, get, create, loading } = useGame();
 
   useEffect(() => {
     get();
@@ -29,6 +30,7 @@ export const Shogi = () => {
           </button>
         </>
       )}
+      {loading && <Loading description={"Game is loading"} />}
     </div>
   );
 };

@@ -36,7 +36,7 @@ export const ShogiBoard = () => {
 
   useEffect(() => {
     if (currentGame !== null) {
-      console.log(currentGame.board);
+      console.log(currentGame);
       setCurrentBoard(currentGame.board);
     }
   }, [currentGame]);
@@ -79,14 +79,17 @@ export const ShogiBoard = () => {
     "+B": "馬",
   };
 
-  const handleMakeMove = (to_square: string) => {
+  const handleMakeMove = async (to_square: string) => {
     if (selectedPiece !== null) {
-      makeMove(selectedPiece, to_square);
+      await makeMove(selectedPiece, to_square);
+      setSelectedPiece(null);
+      setLegalMoves(emptyBoard);
     }
   };
 
   const handlePieceClick = async (from_square: string) => {
     setSelectedPiece(from_square);
+    setLegalMoves(emptyBoard);
     const moves = await getLegalMoves(from_square);
     if (moves !== undefined) setLegalMoves(moves);
   };

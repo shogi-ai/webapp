@@ -1,42 +1,50 @@
+"""Service to manage the game state"""
+
 from firebase_functions.https_fn import FunctionsErrorCode, HttpsError
 
 from repository.dataclasses.game import Game
-from repository.game_repository import GameReposiory
+from repository.game_repository import GameRepository
 from services.board import ShogiBoard
 
 
 class GameService:
-    def __init__(self, app: any, shogi_board: ShogiBoard):
+    """Service to manage the game state"""
+    def __init__(self, app: any):
         self.app: any = app
-        self.shogi_board: ShogiBoard = shogi_board
-        self.game_repository: GameReposiory = GameReposiory(self.app)
+        self.shogi_board = ShogiBoard()
+        self.game_repository = GameRepository(self.app)
 
     def create(self) -> str:
+        """Initialize new game"""
         bitboard, pieces_in_hand = self.shogi_board.get_board()
         game = Game(moves=[], board=bitboard, pieces_in_hand=pieces_in_hand)
         self.game_repository.create(game)
         return game.uid
 
-    def make_move(self, uid: str, from_square: str, to_square: str):
-        game = self.game_repository.get(uid)
-        if game is None:
-            raise HttpsError(
-                code=FunctionsErrorCode.NOT_FOUND,
-                message="Invalid game id",
-            )
+    def make_move(self, uid: str, from_square: str, to_square: str, promotion: bool):
+        """Add a new move to the game"""
+        # Get game, and the board
+        game = self._get_game(uid)
 
-        for move in game["moves"]:
-            self.shogi_board.make_move(move["from_square"], move["to_square"])
+        # Make new move
+        self.shogi_board.make_move(from_square, to_square, promotion)
 
-        self.shogi_board.make_move(from_square, to_square)
-
-        game["moves"].append({"from_square": from_square, "to_square": to_square})
-        bitboard, pieces_in_hand = self.shogi_board.get_board()
-        game.board = bitboard
-        game.pieces_in_hand = pieces_in_hand
+        # Update game object
+        game.moves.append(
+            {"from_square": from_square, "to_square": to_square, "promotion": promotion}
+        )
+        game.board, game.pieces_in_hand = self.shogi_board.get_board()
         self.game_repository.update(game)
 
     def get_legal_moves(self, uid: str, from_square: str):
+        """Get all legal moves for the specified fame, and piece"""
+        # Get game, and the board
+        _ = self._get_game(uid)
+        # Get the legal moves
+        return self.shogi_board.get_legal_moves(from_square)
+
+    def _get_game(self, uid: str) -> Game:
+        """Get the selected game and update the board accordingly"""
         game = self.game_repository.get(uid)
         if game is None:
             raise HttpsError(
@@ -44,7 +52,8 @@ class GameService:
                 message="Invalid game id",
             )
 
-        for move in game["moves"]:
-            self.shogi_board.make_move(move["from_square"], move["to_square"])
-
-        return self.shogi_board.get_legal_moves(from_square)
+        for move in game.moves:
+            self.shogi_board.make_move(
+                move["from_square"], move["to_square"], move["promotion"]
+            )
+        return game
