@@ -7,6 +7,7 @@ from services.board_info import SQUARES, SQUARE_NAMES, COLORS
 
 class ShogiBoard:
     """Class to manage the Shogi board"""
+
     def __init__(self):
         self.board = shogi.Board()
 

@@ -1,4 +1,5 @@
 """Repository class to manage games in the database"""
+
 from firebase_admin.firestore import client
 
 from repository.dataclasses.game import Game
@@ -6,6 +7,7 @@ from repository.dataclasses.game import Game
 
 class GameRepository:
     """Repository class to manage games in the database"""
+
     def __init__(self, app: any):
         self.db = client(app)
         self.collection = "games"

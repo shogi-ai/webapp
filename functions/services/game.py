@@ -9,6 +9,7 @@ from services.board import ShogiBoard
 
 class GameService:
     """Service to manage the game state"""
+
     def __init__(self, app: any):
         self.app: any = app
         self.shogi_board = ShogiBoard()
