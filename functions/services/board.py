@@ -35,12 +35,8 @@ class ShogiBoard:
         piece_legal_moves = []
 
         for move in self.board.legal_moves:
-
-            from_square = move.usi()[:2]
-            to_square = move.usi()[2:]
-
-            if from_square == '2h':
-                piece_legal_moves.append(to_square)
+            if from_square == move.usi()[:2]:
+                piece_legal_moves.append( move.usi()[2:])
 
         board_builder = []
 

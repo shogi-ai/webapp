@@ -6,7 +6,8 @@ interface Move {}
 
 interface Game {
   uid: string;
-  moves: [Move];
+  moves: Move[];
+  board: (string | null)[][];
 }
 
 export interface GameContextType {
@@ -15,7 +16,9 @@ export interface GameContextType {
   get: () => Promise<void>;
   get_by_id: (uid: string) => Promise<void>;
   create: () => Promise<void>;
-  get_legal_move: (from_square: string) => Promise<[Move] | undefined>;
+  get_legal_moves: (
+    from_square: string
+  ) => Promise<(string | null)[][] | undefined>;
 }
 
 export const GameContext = createContext<GameContextType | undefined>(
@@ -35,12 +38,21 @@ export const GameProvider = ({ children }: Props) => {
 
   const rootCollection = "games";
 
+  const make_table = (board_list: [string | null]) => {
+    const result = [];
+    for (let i = 0; i < 81; i += 9) {
+      result.push(board_list.slice(i, i + 9));
+    }
+    return result;
+  };
+
   const _get_by_id = async (uid: string): Promise<Game | null> => {
     const gameRef = doc(db, rootCollection, uid);
     const gameDoc = await getDoc(gameRef);
     if (gameDoc.exists()) {
-      const gameData = gameDoc.data() as Game;
-      return gameData;
+      const gameData = gameDoc.data();
+      gameData.board = make_table(gameData.board);
+      return gameData as Game;
     }
     return null;
   };
@@ -103,12 +115,12 @@ export const GameProvider = ({ children }: Props) => {
     }
   };
 
-  const get_legal_move = async (from_square: string) => {
+  const get_legal_moves = async (from_square: string) => {
     setLoading(true);
     try {
       const getLegalMoves = httpsCallable(functions, "read_legal_moves");
       const response = await getLegalMoves({ from_square });
-      return response.data as [Move];
+      return response.data as (string | null)[][];
     } catch (e) {
       console.error(e);
     } finally {
@@ -122,7 +134,7 @@ export const GameProvider = ({ children }: Props) => {
     get,
     get_by_id,
     create,
-    get_legal_move,
+    get_legal_moves,
   };
 
   return (

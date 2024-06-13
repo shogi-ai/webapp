@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./ShogiBoard.css";
 import Piece from "./Piece";
+import { useGame } from "../hooks/useGame";
 
-const ShogiBoard: React.FC = () => {
+export const ShogiBoard = () => {
+  const { currentGame, get_legal_moves } = useGame();
+
   const rows = 9;
   const cols = 9;
 
@@ -19,9 +22,20 @@ const ShogiBoard: React.FC = () => {
     ["L", "N", "S", "G", "K", "G", "S", "N", "L"],
   ];
 
+  useEffect(() => {
+    if (currentGame !== null) {
+      console.log(currentGame.board);
+      setCurrentBoard(currentGame.board);
+    }
+  }, [currentGame]);
+
   const [move, setMove] = useState("");
+  const [currentBoard, setCurrentBoard] =
+    useState<(string | null)[][]>(initialBoard);
   const [blackCaptured] = useState<string[]>([]);
   const [whiteCaptured] = useState<string[]>([]);
+  const [selectedPiece, setSelectedPiece] = useState<string | null>(null);
+  const [legalMoves, setLegalMoves] = useState<(string | null)[][]>([]);
 
   const pieceSymbols: { [key: string]: string } = {
     p: "歩",
@@ -58,14 +72,27 @@ const ShogiBoard: React.FC = () => {
     setMove("");
   };
 
+  const handlePieceClick = async (row: number, col: number) => {
+    const from_square = `${9 - col}${String.fromCharCode(
+      65 + row
+    ).toLowerCase()}`;
+    setSelectedPiece(from_square);
+    const moves = await get_legal_moves(from_square);
+    if (moves !== undefined) setLegalMoves(moves);
+  };
+
   const renderBoard = () => {
     const board = [];
     for (let row = 0; row < rows; row++) {
       const cells = [];
       for (let col = 0; col < cols; col++) {
-        const piece = initialBoard[row][col];
+        const piece = currentBoard[row][col];
         cells.push(
-          <div key={`${row}-${col}`} className="cell">
+          <div
+            key={`${row}-${col}`}
+            className="cell"
+            onClick={() => handlePieceClick(row, col)}
+          >
             {piece && (
               <Piece
                 symbol={pieceSymbols[piece]}
@@ -135,5 +162,3 @@ const ShogiBoard: React.FC = () => {
     </div>
   );
 };
-
-export default ShogiBoard;

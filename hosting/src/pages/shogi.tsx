@@ -1,4 +1,4 @@
-import ShogiBoard from "../components/ShogiBoard";
+import { ShogiBoard } from "../components/ShogiBoard";
 
 import "../App.css";
 import { useGame } from "../hooks/useGame";

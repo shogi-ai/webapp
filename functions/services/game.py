@@ -10,6 +10,7 @@ class GameService:
         self.game_repository: GameReposiory = GameReposiory(self.app)
 
     def create(self) -> str:
-        game = Game(moves=[])
+        bitboard, pieces_in_hand = self.shogi_board.get_board()
+        game = Game(moves=[], board=bitboard, pieces_in_hand=pieces_in_hand)
         self.game_repository.create(game)
         return game.uid
