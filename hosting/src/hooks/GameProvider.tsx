@@ -14,11 +14,12 @@ export interface GameContextType {
   currentGame: Game | null;
   loading: boolean;
   get: () => Promise<void>;
-  get_by_id: (uid: string) => Promise<void>;
+  getById: (uid: string) => Promise<void>;
   create: () => Promise<void>;
-  get_legal_moves: (
+  getLegalMoves: (
     from_square: string
   ) => Promise<(string | null)[][] | undefined>;
+  makeMove: (from_square: string, to_square: string) => Promise<void>;
 }
 
 export const GameContext = createContext<GameContextType | undefined>(
@@ -46,7 +47,7 @@ export const GameProvider = ({ children }: Props) => {
     return result;
   };
 
-  const _get_by_id = async (uid: string): Promise<Game | null> => {
+  const _getById = async (uid: string): Promise<Game | null> => {
     const gameRef = doc(db, rootCollection, uid);
     const gameDoc = await getDoc(gameRef);
     if (gameDoc.exists()) {
@@ -62,7 +63,7 @@ export const GameProvider = ({ children }: Props) => {
     try {
       const uid = localStorage.getItem("gameUID");
       if (uid) {
-        const game = await _get_by_id(uid);
+        const game = await _getById(uid);
         if (game !== null) {
           setCurrentGame(game);
         }
@@ -74,10 +75,10 @@ export const GameProvider = ({ children }: Props) => {
     }
   };
 
-  const get_by_id = async (uid: string): Promise<void> => {
+  const getById = async (uid: string): Promise<void> => {
     setLoading(true);
     try {
-      const game = await _get_by_id(uid);
+      const game = await _getById(uid);
       if (game !== null) {
         setCurrentGame(game);
       }
@@ -104,7 +105,7 @@ export const GameProvider = ({ children }: Props) => {
       localStorage.setItem("gameUID", uid);
 
       // Update current state
-      const game = await _get_by_id(uid);
+      const game = await _getById(uid);
       if (game !== null) {
         setCurrentGame(game);
       }
@@ -115,12 +116,35 @@ export const GameProvider = ({ children }: Props) => {
     }
   };
 
-  const get_legal_moves = async (from_square: string) => {
+  const getLegalMoves = async (from_square: string) => {
     setLoading(true);
     try {
       const getLegalMoves = httpsCallable(functions, "read_legal_moves");
-      const response = await getLegalMoves({ from_square });
+      const response = await getLegalMoves({
+        from_square,
+        uid: currentGame?.uid,
+      });
       return response.data as (string | null)[][];
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const makeMove = async (from_square: string, to_square: string) => {
+    if (currentGame === null) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const getLegalMoves = httpsCallable(functions, "make_move");
+      await getLegalMoves({
+        from_square,
+        to_square,
+        uid: currentGame?.uid,
+      });
+      await getById(currentGame.uid);
     } catch (e) {
       console.error(e);
     } finally {
@@ -132,9 +156,10 @@ export const GameProvider = ({ children }: Props) => {
     currentGame,
     loading,
     get,
-    get_by_id,
+    getById,
     create,
-    get_legal_moves,
+    getLegalMoves,
+    makeMove,
   };
 
   return (

@@ -27,8 +27,8 @@ class ShogiBoard:
 
         return (bitboard, pieces_in_hand)
 
-    def make_move(self, move):
-        self.board.push(shogi.Move.from_usi(move))
+    def make_move(self, from_square: str, to_square: str):
+        self.board.push(shogi.Move(from_square, to_square))
         return self.get_board()
     
     def get_legal_moves(self, from_square):

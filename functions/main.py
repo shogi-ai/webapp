@@ -22,38 +22,44 @@ def create_game(_: CallableRequest):
      data = game_manager.create()
      return data
 
-
-@on_call(cors=options.CorsOptions(cors_origins="*", cors_methods=["post"]))
-def read_board(_: CallableRequest):
-    data = {
-        "board": shogi_board.get_board()
-    }
-    return data
-
 @on_call(cors=options.CorsOptions(cors_origins="*", cors_methods=["post"]))
 def make_move(req: CallableRequest):
-    move_str = req.data.get("move")
-    if move_str is None:
+    from_square = req.data.get("from_square")
+    to_square = req.data.get("to_square")
+    uid = req.data.get("uid")
+
+    if from_square is None:
         raise HttpsError(
-            code=FunctionsErrorCode.NOT_FOUND,
+            code=FunctionsErrorCode.FAILED_PRECONDITION,
             message="Invalid from_square",
         )
-    data = {
-        "board": shogi_board.make_move(move_str)
-    }
-    return data
+    if to_square is None:
+        raise HttpsError(
+            code=FunctionsErrorCode.FAILED_PRECONDITION,
+            message="Invalid from_square",
+        )
+    if uid is None:
+        raise HttpsError(
+            code=FunctionsErrorCode.FAILED_PRECONDITION,
+            message="Invalid from_square",
+        )
+
+    return game_manager.make_move(uid,  from_square, to_square)
 
 @on_call(cors=options.CorsOptions(cors_origins="*", cors_methods=["post"]))
 def read_legal_moves(req: CallableRequest):
-    piece_from_square = req.data.get("from_square")
-    if piece_from_square is None:
+    from_square = req.data.get("from_square")
+    uid = req.data.get("uid")
+
+    if from_square is None:
         raise HttpsError(
-            code=FunctionsErrorCode.NOT_FOUND,
+            code=FunctionsErrorCode.FAILED_PRECONDITION,
+            message="Invalid from_square",
+        )
+    if uid is None:
+        raise HttpsError(
+            code=FunctionsErrorCode.FAILED_PRECONDITION,
             message="Invalid from_square",
         )
 
-    data = {
-        "legal_moves": shogi_board.get_legal_moves(piece_from_square)
-    }
-
-    return data
+    return game_manager.get_legal_moves(uid, from_square)
