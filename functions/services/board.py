@@ -5,7 +5,7 @@ from services.board_info import SQUARES, SQUARE_NAMES, COLORS
 class ShogiBoard:
     def __init__(self):
         self.board = shogi.Board()
-    
+
     def get_board(self):
         bitboard = []
         pieces_in_hand = []

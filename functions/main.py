@@ -4,34 +4,56 @@ To get started, simply uncomment the below code or create your own.
 Deploy with `firebase deploy
 """
 
-from firebase_functions import https_fn, options
+from firebase_functions.https_fn import on_call, CallableRequest, HttpsError, FunctionsErrorCode
+from firebase_functions import options
 from firebase_admin import initialize_app
 from services.board import ShogiBoard
+from services.game import GameService
 
 app = initialize_app()
+options.set_global_options(region=options.SupportedRegion.EUROPE_WEST1)
+
 shogi_board = ShogiBoard()
-    
-@https_fn.on_request(cors=options.CorsOptions(cors_origins="*", cors_methods=["get", "post"]))
-def read_board(req: https_fn.Request) -> https_fn.Response:
-    return {
+game_manager = GameService(app, shogi_board)
+
+
+@on_call(cors=options.CorsOptions(cors_origins="*", cors_methods=["post"]))
+def create_game(_: CallableRequest):
+     data = game_manager.create()
+     return data
+
+
+@on_call(cors=options.CorsOptions(cors_origins="*", cors_methods=["post"]))
+def read_board(_: CallableRequest):
+    data = {
         "board": shogi_board.get_board()
     }
+    return data
 
-@https_fn.on_request()
-def make_move(req: https_fn.Request) -> https_fn.Response:
-    move_str = req.args.get("move")
+@on_call(cors=options.CorsOptions(cors_origins="*", cors_methods=["post"]))
+def make_move(req: CallableRequest):
+    move_str = req.data.get("move")
     if move_str is None:
-        return https_fn.Response("Invalid move", status=400)
-    
-    return {
+        raise HttpsError(
+            code=FunctionsErrorCode.NOT_FOUND,
+            message="Invalid from_square",
+        )
+    data = {
         "board": shogi_board.make_move(move_str)
     }
+    return data
 
-@https_fn.on_request()
-def read_legal_moves(req: https_fn.Request) -> https_fn.Response:
-    piece_from_square = req.args.get("from_square")
+@on_call(cors=options.CorsOptions(cors_origins="*", cors_methods=["post"]))
+def read_legal_moves(req: CallableRequest):
+    piece_from_square = req.data.get("from_square")
     if piece_from_square is None:
-        return https_fn.Response("Invalid from_square", status=400)
-    return {
+        raise HttpsError(
+            code=FunctionsErrorCode.NOT_FOUND,
+            message="Invalid from_square",
+        )
+
+    data = {
         "legal_moves": shogi_board.get_legal_moves(piece_from_square)
     }
+
+    return data

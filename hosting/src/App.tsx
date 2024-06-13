@@ -15,6 +15,7 @@ import { connectStorageEmulator, getStorage } from "firebase/storage";
 import { connectDatabaseEmulator, getDatabase } from "firebase/database";
 
 import { Routing } from "./routes.tsx";
+import { GameProvider } from "./hooks/GameProvider.tsx";
 
 export const App = () => {
   const app = initializeApp(firebaseConfig);
@@ -44,7 +45,9 @@ export const App = () => {
         <FirestoreProvider sdk={firestore}>
           <StorageProvider sdk={storage}>
             <DatabaseProvider sdk={database}>
-              <Routing />
+              <GameProvider>
+                <Routing />
+              </GameProvider>
             </DatabaseProvider>
           </StorageProvider>
         </FirestoreProvider>
