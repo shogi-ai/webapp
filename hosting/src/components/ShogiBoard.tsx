@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./ShogiBoard.css";
 import Piece from "./Piece";
+import { useGame } from "../hooks/useGame";
 
-const ShogiBoard: React.FC = () => {
+export const ShogiBoard = () => {
+  const { currentGame, getLegalMoves, makeMove } = useGame();
+
   const rows = 9;
   const cols = 9;
 
@@ -19,9 +22,31 @@ const ShogiBoard: React.FC = () => {
     ["L", "N", "S", "G", "K", "G", "S", "N", "L"],
   ];
 
-  const [move, setMove] = useState("");
+  const emptyBoard = [
+    [null, null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, null],
+  ];
+
+  useEffect(() => {
+    if (currentGame !== null) {
+      console.log(currentGame);
+      setCurrentBoard(currentGame.board);
+    }
+  }, [currentGame]);
+
+  const [currentBoard, setCurrentBoard] =
+    useState<(string | null)[][]>(initialBoard);
   const [blackCaptured] = useState<string[]>([]);
   const [whiteCaptured] = useState<string[]>([]);
+  const [selectedPiece, setSelectedPiece] = useState<string | null>(null);
+  const [legalMoves, setLegalMoves] = useState<(string | null)[][]>(emptyBoard);
 
   const pieceSymbols: { [key: string]: string } = {
     p: "歩",
@@ -54,8 +79,19 @@ const ShogiBoard: React.FC = () => {
     "+B": "馬",
   };
 
-  const handleMoveSubmit = () => {
-    setMove("");
+  const handleMakeMove = async (to_square: string) => {
+    if (selectedPiece !== null) {
+      await makeMove(selectedPiece, to_square);
+      setSelectedPiece(null);
+      setLegalMoves(emptyBoard);
+    }
+  };
+
+  const handlePieceClick = async (from_square: string) => {
+    setSelectedPiece(from_square);
+    setLegalMoves(emptyBoard);
+    const moves = await getLegalMoves(from_square);
+    if (moves !== undefined) setLegalMoves(moves);
   };
 
   const renderBoard = () => {
@@ -63,9 +99,24 @@ const ShogiBoard: React.FC = () => {
     for (let row = 0; row < rows; row++) {
       const cells = [];
       for (let col = 0; col < cols; col++) {
-        const piece = initialBoard[row][col];
+        const piece = currentBoard[row][col];
+        const from_square = `${9 - col}${String.fromCharCode(
+          65 + row
+        ).toLowerCase()}`;
+        const isSelected = selectedPiece === from_square;
+        const isLegalMove = legalMoves[row][col] !== null;
         cells.push(
-          <div key={`${row}-${col}`} className="cell">
+          <div
+            key={`${row}-${col}`}
+            className={`cell ${isSelected ? "selected_piece" : ""} ${
+              isLegalMove ? "legal_moves" : ""
+            }`}
+            onClick={() => {
+              isLegalMove
+                ? handleMakeMove(from_square)
+                : handlePieceClick(from_square);
+            }}
+          >
             {piece && (
               <Piece
                 symbol={pieceSymbols[piece]}
@@ -113,15 +164,6 @@ const ShogiBoard: React.FC = () => {
     <div className="board-container">
       {renderTopCoordinates()}
       <div className="board">{renderBoard()}</div>
-      <div className="move-input">
-        <input
-          type="text"
-          value={move}
-          onChange={(e) => setMove(e.target.value)}
-          placeholder="e.g., 7g7f"
-        />
-        <button onClick={handleMoveSubmit}>Submit Move</button>
-      </div>
       <div className="captured-container">
         <div className="black-captured">
           <h3>Black Captured</h3>
@@ -135,5 +177,3 @@ const ShogiBoard: React.FC = () => {
     </div>
   );
 };
-
-export default ShogiBoard;
