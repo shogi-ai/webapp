@@ -5,6 +5,7 @@ from firebase_functions.https_fn import FunctionsErrorCode, HttpsError
 from repository.dataclasses.game import Game
 from repository.game_repository import GameRepository
 from services.board import ShogiBoard
+from services.agent import ShogiAgent
 
 
 class GameService:
@@ -14,6 +15,7 @@ class GameService:
         self.app: any = app
         self.shogi_board = ShogiBoard()
         self.game_repository = GameRepository(self.app)
+        self.shogi_agent = ShogiAgent("/tmp/shogi-agent.pth")
 
     def create(self) -> str:
         """Initialize new game"""
@@ -58,3 +60,10 @@ class GameService:
                 move["from_square"], move["to_square"], move["promotion"]
             )
         return game
+
+
+    def get_best_move(self, uid: str):
+        """Get the best move for the current player"""
+        _ = self._get_game(uid)
+        move, move_index = self.shogi_agent.select_best_action(self.shogi_board)
+        return move, move_index

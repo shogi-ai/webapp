@@ -11,8 +11,9 @@ from firebase_functions.https_fn import (
     FunctionsErrorCode,
 )
 from firebase_functions import options
-from firebase_admin import initialize_app
+from firebase_admin import initialize_app, storage
 from services.game import GameService
+import zipfile
 
 app = initialize_app()
 options.set_global_options(region=options.SupportedRegion.EUROPE_WEST1)
@@ -74,3 +75,25 @@ def read_legal_moves(req: CallableRequest):
 
     game_manager = GameService(app)
     return game_manager.get_legal_moves(uid, from_square)
+
+
+@on_call(cors=options.CorsOptions(cors_origins="*", cors_methods=["get"]))
+def choose_best_move(req: CallableRequest):
+    """Endpoint to choose the best move"""
+    bucket = storage.bucket()
+    blob = bucket.blob('shogi-agent.zip')
+    blob.download_to_filename('/tmp/shogi-agent.zip')
+    
+    with zipfile.ZipFile('/tmp/shogi-agent.zip', 'r') as zip_ref:
+        zip_ref.extractall('/tmp/')
+
+    uid = req.data.get("uid")
+
+    if uid is None:
+        raise HttpsError(
+            code=FunctionsErrorCode.FAILED_PRECONDITION,
+            message="Invalid from_square",
+        )
+
+    game_manager = GameService(app)
+    return game_manager.choose_best_move(uid)
