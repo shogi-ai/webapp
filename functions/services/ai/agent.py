@@ -26,6 +26,7 @@ class ShogiAgent:
         self.target_network = DQN()
         if path:
             self.get_model(path)
+
     @staticmethod
     def get_move_index(move):
         """
@@ -40,7 +41,7 @@ class ShogiAgent:
         Converts a move to an index.
         """
         # pieces = ["", "p", "l", "n", "s", "g", "b", "r"]
-        if(move.from_square == None):
+        if move.from_square is None:
             # from_square max = 81
             return 81 + move.drop_piece_type - 1
             # now from_square max = 88

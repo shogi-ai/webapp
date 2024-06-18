@@ -5,8 +5,9 @@
 # R0902: Too many instance attributes
 # R1725: Consider using Python 3 style super() without arguments
 # R0801: Similar lines in 2 files
+# R1721: Unnecessary use of a comprehension, use list(generator) instead.
 
-disable = W0212, R0902, R1725, R0801
+disable = W0212, R0902, R1725, R0801, R1721
 
 # Set the maximum line length to 140 characters
 max-line-length=140

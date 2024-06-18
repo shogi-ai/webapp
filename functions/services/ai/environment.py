@@ -49,6 +49,9 @@ class ShogiEnv(gym.Env):
         """
         self.board = shogi.Board()
 
+    def step(self, action: Move) -> (np.array, float, bool, bool, dict):
+        pass
+
     def sample_action(self) -> Move:
         """
         Sample a random legal move for the specified player.
@@ -129,11 +132,7 @@ class ShogiEnv(gym.Env):
         return np.array(indices)
 
     def render(self):
-        """
-        Render the current state of the Shogi board.
-        """
-        print("=" * 25)
-        print(self.board)
+        pass
 
     def get_legal_moves(self) -> list[Move]:
         """Get all legal moves"""
