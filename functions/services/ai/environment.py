@@ -20,21 +20,6 @@ class ShogiEnv(gym.Env):
     This environment simulates a game of Shogi, a Japanese variant of chess.
     It provides an action space representing all possible moves and an observation space representing the Shogi board.
     The game continues until a player wins, the game reaches a stalemate, or a specified number of moves is reached.
-
-    Attributes:
-        board: Shogi board object.
-        action_space: MultiDiscrete space representing all possible moves.
-        observation_space: MultiDiscrete space representing the Shogi board.
-        move: Number of moves made in the game.
-
-    Methods:
-        __init__: Initialize the Shogi environment.
-        reset: Reset the environment to its initial state.
-        sample_action: Sample a random legal move.
-        step: Take a step in the environment based on the action.
-        get_observation: Get the current observation of the Shogi board.
-        render: Render the current state of the Shogi board.
-        mask_and_valid_moves: Get the mask and valid moves for the current player.
     """
 
     def __init__(self):
@@ -69,15 +54,6 @@ class ShogiEnv(gym.Env):
     ) -> np.array:
         """
         Reset the environment to its initial state.
-
-        Resets the Shogi board and move counter.
-
-        Args:
-            seed: Random seed for environment (not used).
-            options: Additional options (not used).
-
-        Returns:
-            numpy array: Initial observation.
         """
         self.board = shogi.Board()
         self.move = 0
@@ -86,9 +62,6 @@ class ShogiEnv(gym.Env):
     def sample_action(self) -> Move:
         """
         Sample a random legal move for the specified player.
-
-        Returns:
-            shogi.Move: Random legal move for the specified player.
         """
         legal_moves = self.get_legal_moves()
         return random.choice(legal_moves)
@@ -96,12 +69,6 @@ class ShogiEnv(gym.Env):
     def step(self, action: Move) -> (np.array, float, bool, bool, dict):
         """
         Take a step in the environment based on the action.
-
-        Args:
-            action (shogi.Move): Action to take (legal move).
-
-        Returns:
-            tuple: Tuple containing the next observation, reward, termination status, truncation status, and additional info.
         """
         if action not in self.board.legal_moves:
             raise IllegalMoveException()
@@ -133,9 +100,6 @@ class ShogiEnv(gym.Env):
     def get_observation(self) -> np.array:
         """
         Get the current bitboard of the Shogi board.
-
-        Returns:
-            list: List representing the current bitboard of the Shogi board.
         """
         piece_symbols = [
             "",
@@ -184,12 +148,6 @@ class ShogiEnv(gym.Env):
     def _get_piece_name(piece_type: int) -> str:
         """
         Get piece name based on piece type.
-
-        Args:
-            piece_type (int): The piece type you want the name of.
-
-        Return:
-            str: The name of the piece
         """
         piece_types = [
             "PAWN",
