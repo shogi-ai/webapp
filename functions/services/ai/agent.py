@@ -26,20 +26,38 @@ class ShogiAgent:
         self.target_network = DQN()
         if path:
             self.get_model(path)
+    @staticmethod
+    def get_move_index(move):
+        """
+        Converts a move to an index.
+        """
+        index = 81 * ShogiAgent.get_from_square(move) + move.to_square
+        return index
+
+    @staticmethod
+    def get_from_square(move):
+        """
+        Converts a move to an index.
+        """
+        # pieces = ["", "p", "l", "n", "s", "g", "b", "r"]
+        if(move.from_square == None):
+            # from_square max = 81
+            return 81 + move.drop_piece_type - 1
+            # now from_square max = 88
+        return move.from_square
 
     def mask_and_valid_moves(self, env: ShogiEnv) -> (np.array, dict):
         """
         Get the mask and valid moves for the current player.
         """
-        mask = np.zeros((81, 81))
+        mask = np.zeros((88, 81))
         valid_moves_dict = {}
 
         legal_moves = env.get_legal_moves()
 
         for move in legal_moves:
-            mask[move.from_square, move.to_square] = 1
-            index = 81 * move.from_square + move.to_square
-            valid_moves_dict[index] = move
+            mask[self.get_from_square(move), move.to_square] = 1
+            valid_moves_dict[self.get_move_index(move)] = move
 
         return mask, valid_moves_dict
 
@@ -48,8 +66,8 @@ class ShogiAgent:
         Selects an action using an epsilon-greedy policy.
         """
         valid_moves, valid_move_dict = self.mask_and_valid_moves(env)
-        current_state = env.get_observation()
 
+        current_state = env.get_observation()
         valid_moves_tensor = torch.from_numpy(valid_moves).float().unsqueeze(0)
         current_state_tensor = torch.from_numpy(current_state).float().unsqueeze(0)
         valid_moves_tensor = valid_moves_tensor.view(current_state_tensor.size(0), -1)

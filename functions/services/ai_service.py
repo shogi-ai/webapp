@@ -26,7 +26,7 @@ class AiService:
                 move["to_square"],
                 move["promotion"],
             )
-            _, _, _, _, _ = self.env.step(move)
+            self.env.board.push(move)
 
     def make_move(self) -> shogi.Move:
         """Have the AI make a move"""
