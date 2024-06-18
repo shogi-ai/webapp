@@ -69,8 +69,23 @@ def read_legal_moves(req: CallableRequest):
     if uid is None:
         raise HttpsError(
             code=FunctionsErrorCode.FAILED_PRECONDITION,
-            message="Invalid from_square",
+            message="Invalid game id",
         )
 
     game_manager = GameService(app)
     return game_manager.get_legal_moves(uid, from_square)
+
+
+@on_call(cors=options.CorsOptions(cors_origins="*", cors_methods=["post"]))
+def ai_move(req: CallableRequest):
+    """Endpoint for when its the ais turn"""
+    uid = req.data.get("uid")
+
+    if uid is None:
+        raise HttpsError(
+            code=FunctionsErrorCode.FAILED_PRECONDITION,
+            message="Invalid game id",
+        )
+
+    game_manager = GameService(app)
+    return game_manager.ai_move(uid)

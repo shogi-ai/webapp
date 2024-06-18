@@ -20,6 +20,7 @@ export interface GameContextType {
     from_square: string
   ) => Promise<(string | null)[][] | undefined>;
   makeMove: (from_square: string, to_square: string) => Promise<void>;
+  aiMove: () => Promise<void>;
 }
 
 export const GameContext = createContext<GameContextType | undefined>(
@@ -116,6 +117,22 @@ export const GameProvider = ({ children }: Props) => {
     }
   };
 
+  const aiMove = async () => {
+    if (!currentGame) return;
+    setLoading(true);
+    try {
+      const Function = httpsCallable(functions, "ai_move");
+      await Function({
+        uid: currentGame.uid,
+      });
+      await getById(currentGame.uid);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getLegalMoves = async (from_square: string) => {
     setLoading(true);
     try {
@@ -160,6 +177,7 @@ export const GameProvider = ({ children }: Props) => {
     create,
     getLegalMoves,
     makeMove,
+    aiMove,
   };
 
   return (
