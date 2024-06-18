@@ -4,7 +4,7 @@ import Piece from "./Piece";
 import { useGame } from "../hooks/useGame";
 
 export const ShogiBoard = () => {
-  const { currentGame, getLegalMoves, makeMove } = useGame();
+  const { currentGame, getLegalMoves, makeMove, aiMove } = useGame();
 
   const rows = 9;
   const cols = 9;
@@ -77,6 +77,12 @@ export const ShogiBoard = () => {
     "+S": "全",
     "+R": "龍",
     "+B": "馬",
+  };
+
+  const handleAiMove = async () => {
+    await aiMove();
+    setSelectedPiece(null);
+    setLegalMoves(emptyBoard);
   };
 
   const handleMakeMove = async (to_square: string) => {
@@ -165,6 +171,7 @@ export const ShogiBoard = () => {
       {renderTopCoordinates()}
       <div className="board">{renderBoard()}</div>
       <div className="captured-container">
+        <button onClick={() => handleAiMove()}>Use AI</button>
         <div className="black-captured">
           <h3>Black Captured</h3>
           {renderCapturedPieces(blackCaptured, true)}
