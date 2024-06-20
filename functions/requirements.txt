@@ -3,5 +3,5 @@ firebase-functions~=0.4.1
 functions-framework~=3.4.0
 python-shogi~=1.1.1
 gymnasium~=0.29.1
-# torch~=2.3.1
+torch~=2.3.1
 # numpy==1.26.4
