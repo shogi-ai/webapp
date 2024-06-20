@@ -61,11 +61,6 @@ def read_legal_moves(req: CallableRequest):
     from_square = req.data.get("from_square")
     uid = req.data.get("uid")
 
-    if from_square is None:
-        raise HttpsError(
-            code=FunctionsErrorCode.FAILED_PRECONDITION,
-            message="Invalid from_square",
-        )
     if uid is None:
         raise HttpsError(
             code=FunctionsErrorCode.FAILED_PRECONDITION,

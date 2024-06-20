@@ -25,6 +25,7 @@ class ShogiAgent:
         """
         self.target_network = DQN()
         if path:
+            print(path)
             self.get_model(path)
 
     @staticmethod

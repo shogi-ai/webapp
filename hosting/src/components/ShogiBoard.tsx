@@ -3,6 +3,21 @@ import "./ShogiBoard.css";
 import Piece from "./Piece";
 import { useGame } from "../hooks/useGame";
 
+function filterByCase(
+  inputList: string[],
+  caseType: "lowercase" | "uppercase"
+): string[] {
+  const filteredList: string[] = [];
+  inputList.forEach((char) => {
+    if (caseType === "lowercase" && char >= "a" && char <= "z") {
+      filteredList.push(char);
+    } else if (caseType === "uppercase" && char >= "A" && char <= "Z") {
+      filteredList.push(char);
+    }
+  });
+  return filteredList;
+}
+
 export const ShogiBoard = () => {
   const { currentGame, getLegalMoves, makeMove, aiMove } = useGame();
 
@@ -34,19 +49,25 @@ export const ShogiBoard = () => {
     [null, null, null, null, null, null, null, null, null],
   ];
 
-  useEffect(() => {
-    if (currentGame !== null) {
-      console.log(currentGame);
-      setCurrentBoard(currentGame.board);
-    }
-  }, [currentGame]);
-
   const [currentBoard, setCurrentBoard] =
     useState<(string | null)[][]>(initialBoard);
-  const [blackCaptured] = useState<string[]>([]);
-  const [whiteCaptured] = useState<string[]>([]);
+  const [blackCaptured, setBlackCaptured] = useState<string[]>([]);
+  const [whiteCaptured, setWhiteCaptured] = useState<string[]>([]);
   const [selectedPiece, setSelectedPiece] = useState<string | null>(null);
   const [legalMoves, setLegalMoves] = useState<(string | null)[][]>(emptyBoard);
+
+  useEffect(() => {
+    if (currentGame === null) return;
+    setCurrentBoard(currentGame.board);
+  }, [currentGame]);
+
+  useEffect(() => {
+    if (currentGame === null) return;
+    const _peices_white = filterByCase(currentGame.pieces_in_hand, "uppercase");
+    const _peices_black = filterByCase(currentGame.pieces_in_hand, "lowercase");
+    setWhiteCaptured(_peices_white);
+    setBlackCaptured(_peices_black);
+  }, [currentGame]);
 
   const pieceSymbols: { [key: string]: string } = {
     p: "歩",
@@ -93,10 +114,11 @@ export const ShogiBoard = () => {
     }
   };
 
-  const handlePieceClick = async (from_square: string) => {
+  const handlePieceClick = async (from_square: string | null) => {
     setSelectedPiece(from_square);
     setLegalMoves(emptyBoard);
     const moves = await getLegalMoves(from_square);
+    console.log(moves);
     if (moves !== undefined) setLegalMoves(moves);
   };
 
@@ -160,7 +182,12 @@ export const ShogiBoard = () => {
     return (
       <div className="captured-pieces">
         {captured.map((piece, index) => (
-          <Piece key={index} symbol={pieceSymbols[piece]} isBlack={isBlack} />
+          <Piece
+            key={index}
+            symbol={pieceSymbols[piece]}
+            isBlack={isBlack}
+            onClick={() => handlePieceClick(null)}
+          />
         ))}
       </div>
     );

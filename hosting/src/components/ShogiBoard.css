@@ -85,3 +85,13 @@
   border: 1px solid #ffffff;
   background-color: #2f37a1;
 }
+
+.captured-container .white {
+  color: black;
+  margin: "2px";
+}
+
+.captured-container .black {
+  color: black;
+  margin: "2px";
+}

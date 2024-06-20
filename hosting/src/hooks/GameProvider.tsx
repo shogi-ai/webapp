@@ -7,6 +7,7 @@ interface Move {}
 interface Game {
   uid: string;
   moves: Move[];
+  pieces_in_hand: string[];
   board: (string | null)[][];
 }
 
@@ -17,7 +18,7 @@ export interface GameContextType {
   getById: (uid: string) => Promise<void>;
   create: () => Promise<void>;
   getLegalMoves: (
-    from_square: string
+    from_square: string | null
   ) => Promise<(string | null)[][] | undefined>;
   makeMove: (from_square: string, to_square: string) => Promise<void>;
   aiMove: () => Promise<void>;
@@ -133,7 +134,7 @@ export const GameProvider = ({ children }: Props) => {
     }
   };
 
-  const getLegalMoves = async (from_square: string) => {
+  const getLegalMoves = async (from_square: string | null) => {
     setLoading(true);
     try {
       const getLegalMoves = httpsCallable(functions, "read_legal_moves");

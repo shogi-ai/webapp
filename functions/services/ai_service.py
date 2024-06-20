@@ -15,7 +15,7 @@ class AiService:
         gym.register(id="Shogi-v0", entry_point="services.ai.environment:ShogiEnv")
         self.env: ShogiEnv = gym.make("Shogi-v0")
         self.env.reset()
-        self.agent = ShogiAgent()
+        self.agent = ShogiAgent(path="model/shogi-agent.pth")
 
     def setup_game(self, game: Game):
         """Update the env based on the game settings"""
